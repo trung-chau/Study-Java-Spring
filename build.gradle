@@ -1,3 +1,10 @@
+/*
+ * Copyright (c) 2025. demo Spring Boot BE.
+ * Created by: Trung Chau
+ *
+ * This file is part of demo Spring Boot BE.
+ */
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '4.0.0'
@@ -43,6 +50,8 @@ dependencies {
 
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 }
 
 tasks.named('test') {

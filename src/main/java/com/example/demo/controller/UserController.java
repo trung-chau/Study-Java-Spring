@@ -1,10 +1,19 @@
+/*
+ * Copyright (c) 2025. demo Spring Boot BE.
+ * Created by: Trung Chau
+ *
+ * This file is part of demo Spring Boot BE.
+ */
+
 package com.example.demo.controller;
 
+import com.example.demo.dto.request.RegisterRequest;
 import com.example.demo.entity.User;
 import com.example.demo.service.AuthenticationService;
-import com.example.demo.dto.request.RegisterRequest;
+import jakarta.validation.constraints.Min;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +21,7 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/users")
 @RequiredArgsConstructor
+@Validated
 public class UserController {
 
     private final AuthenticationService service;
@@ -35,7 +45,8 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<String> deleteUser(
+            @PathVariable @Min(value = 1, message = "Minium input value is 1") Long id) {
         service.deleteUser(id);
         return ResponseEntity.ok("User deleted successfully");
     }

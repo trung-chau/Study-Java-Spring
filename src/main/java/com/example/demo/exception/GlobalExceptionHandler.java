@@ -1,5 +1,13 @@
+/*
+ * Copyright (c) 2025. demo Spring Boot BE.
+ * Created by: Trung Chau
+ *
+ * This file is part of demo Spring Boot BE.
+ */
+
 package com.example.demo.exception;
 
+import jakarta.validation.ConstraintViolationException;
 import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -15,7 +23,7 @@ import java.util.Map;
 @RestControllerAdvice
 public class GlobalExceptionHandler {
 
-    // 1. Handle Login Failed (Bad Credentials)
+    // Handle Login Failed (Bad Credentials)
     @ExceptionHandler(BadCredentialsException.class)
     public ResponseEntity<ErrorResponse> handleBadCredentials(BadCredentialsException ex) {
         ErrorResponse error = new ErrorResponse(
@@ -27,7 +35,7 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.UNAUTHORIZED);
     }
 
-    // 2. Handle Duplicate Entry (Unique Constraint Violation)
+    // Handle Duplicate Entry (Unique Constraint Violation)
     @ExceptionHandler(DataIntegrityViolationException.class)
     public ResponseEntity<ErrorResponse> handleDuplicateEntry(DataIntegrityViolationException ex) {
         ErrorResponse error = new ErrorResponse(
@@ -39,18 +47,30 @@ public class GlobalExceptionHandler {
         return new ResponseEntity<>(error, HttpStatus.CONFLICT);
     }
 
-    // 3. Handle Validation Errors (Request Body Validation)
+    // Handle Validation Errors (Request Body Validation)
     @ExceptionHandler(MethodArgumentNotValidException.class)
     public ResponseEntity<Object> handleValidationExceptions(MethodArgumentNotValidException ex) {
         Map<String, String> errors = new HashMap<>();
         ex.getBindingResult().getFieldErrors().forEach(error ->
                 errors.put(error.getField(), error.getDefaultMessage())
         );
-
         return new ResponseEntity<>(errors, HttpStatus.BAD_REQUEST);
     }
 
-    // 4. Handle General Exceptions (Internal Server Error)
+    @ExceptionHandler(ConstraintViolationException.class)
+    public ResponseEntity<ErrorResponse> handleConstraintViolationException(ConstraintViolationException ex) {
+        // Extract the first error message cleanly
+        String errorMessage = ex.getConstraintViolations().iterator().next().getMessage();
+        ErrorResponse error = new ErrorResponse(
+                LocalDateTime.now(),
+                HttpStatus.BAD_REQUEST.value(), // 400 (Should be Bad Request, not Internal Server Error)
+                "Invalid Parameter",
+                errorMessage
+        );
+        return new ResponseEntity<>(error, HttpStatus.BAD_REQUEST);
+    }
+
+    // Handle General Exceptions (Internal Server Error)
     @ExceptionHandler(Exception.class)
     public ResponseEntity<ErrorResponse> handleGeneralException(Exception ex) {
         ex.printStackTrace();
